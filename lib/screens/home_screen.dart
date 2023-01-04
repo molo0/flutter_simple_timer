@@ -11,15 +11,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int totalSecond = 45 * 60;
+  static const maxMinutes = 45 * 60;
+  int totalSecond = maxMinutes;
+  int routineCount = 0;
   bool isPlaying = false;
   late Timer timer;
 
   void onTimerStart(Timer timer) {
     log('$totalSecond');
-    setState(() {
-      totalSecond = totalSecond - 1;
-    });
+    if (totalSecond == 0) {
+      setState(() {
+        routineCount = routineCount + 1;
+        totalSecond = maxMinutes;
+        isPlaying = false;
+      });
+      timer.cancel();
+    } else {
+      setState(() {
+        totalSecond = totalSecond - 1;
+      });
+    }
   }
 
   void onPlayPressed() {
@@ -36,6 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String format(int seconds) {
+    String strSeconds = Duration(seconds: seconds).toString();
+    return strSeconds.split('.')[0].substring(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                '$totalSecond',
+                format(totalSecond),
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 88,
@@ -93,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Text(
-                          '0',
+                          '$routineCount',
                           style: TextStyle(
                             color: Theme.of(context).textTheme.headline1!.color,
                             fontSize: 40,
